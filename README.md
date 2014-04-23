@@ -1,5 +1,7 @@
-Platform Independent Button Debouncer
+Button Debouncer
 =====================================
+
+Platform Independent
 
 I implemented Jack Ganssle's State Button Debouncer Algorithm as C/C++ platform independent 
 libraries. This is a fairly robust algorithm that can play nicely with interrupts (if the 
