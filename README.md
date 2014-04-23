@@ -1,4 +1,4 @@
-Platform-Independent-Button-Debouncer
+Platform Independent Button Debouncer
 =====================================
 
 I implemented Jack Ganssle's State Button Debouncer Algorithm as C/C++ platform independent 
