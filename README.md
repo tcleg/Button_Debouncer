@@ -14,3 +14,6 @@ you would like a detailed explanation of the theory behind the algorithm, feel f
 follow the link provided below: 
  
 http://www.ganssle.com/debouncing.htm
+
+All of the documentation for how to use the libraries can be found inside the header
+files.
