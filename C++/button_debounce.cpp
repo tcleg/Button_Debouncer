@@ -1,24 +1,34 @@
 //*********************************************************************************
-// Button Debouncer
+// State Button Debouncer - Platform Independent
+// 
+// Revision: 1.2
 // 
 // Description: Debounces buttons on a single port being used by the application.
 // This module takes what the signal on a GPIO port is doing and removes
 // the oscillations caused by a bouncing button and tells the application if
-// the button(s) are debounced.
+// the button(s) are debounced. A benefit of this algorithm is that it can play
+// nicely with button interrupts. Below is an example of how the button debouncer
+// would work in practice in relation to a single button:
+// 
+// Real Signal:     00110000000000000001110000000000000000001111111000000000000000
+// Bouncy Signal:   00101110000000000001101010000000000000001010101101000000000000
+// Debounced Sig:   00111111111111111001111111111111111000001111111111111111111100
 // 
 // The debouncing algorithm used in this library is based partly on Jack
-// Ganssle's state button debouncer example shown in,
-// "A Guide to Debouncing" Rev. 3.
-//
-// An explanation of the concepts expressed in this library can be found here:
-// http://www.ganssle.com/debouncing.htm
+// Ganssle's state button debouncer example shown in, "A Guide to Debouncing" 
+// Rev 4. http://www.ganssle.com/debouncing.htm
 // 
-// Copyright (C) 2014 Trent Cleghorn
+// Revisions can be found here:
+// https://www.dropbox.com/sh/5aqe3wxf9fetv4s/ne4C3lgxDR
+// 
+// Copyright (C) 2014 Trent Cleghorn , <trentoncleghorn@gmail.com>
+// 
+//                                  MIT License
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, andór sell
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 // 
@@ -40,16 +50,17 @@
 #include "button_debounce.h"
 
 //*********************************************************************************
-// Functions
+// Class Functions
 //*********************************************************************************
 Debouncer::
-Debouncer()
+Debouncer(uint8_t pulledUpButtons)
 {
     uint8_t i;
     
     index = 0;
     debouncedState = 0xFF;
     changed = 0x00;
+    pullType = pulledUpButtons;
     
     // Initialize the state array
     for(i = 0; i < MAX_BUTTON_CHECKS; i++)
@@ -64,10 +75,11 @@ ButtonProcess(uint8_t portStatus)
     uint8_t i;
     uint8_t lastDebouncedState = debouncedState;
     
-    if(USING_BUTTON_PULLUPS == false)
-    {
-        portStatus = ~portStatus;
-    }
+    // If a button is high and is pulled down or
+    // if a button is low and is pulled high, use a 0 bit
+    // to denote the button has changed state. Else, a 1 bit
+    // shows it is in a normal position.
+    portStatus = ~(portStatus ^ pullType);
     
     // Save the port status info into the state array
     state[index] = portStatus;
@@ -75,7 +87,7 @@ ButtonProcess(uint8_t portStatus)
     // Debounce the buttons
     for(i = 0, debouncedState = 0xFF; i < MAX_BUTTON_CHECKS; i++)
     {
-        debouncedState = debouncedState & state[i];
+        debouncedState &= state[i];
     }
     
     // Check to make sure the index hasn't gone over the limit
@@ -85,7 +97,7 @@ ButtonProcess(uint8_t portStatus)
         index = 0;
     }
     
-    // Calculate what changed
+    // Calculate what changed.
     // If the switch was high and is now low, 1 and 0 xORed with
     // each other produces a 1. If the switch was low and is now
     // high, 0 and 1 xORed with each other produces a 1. Otherwise,
@@ -93,46 +105,28 @@ ButtonProcess(uint8_t portStatus)
     changed = debouncedState ^ lastDebouncedState;
 }
 
-bool Debouncer::
-ButtonPressed(uint8_t GPIOButtonPin)
+uint8_t Debouncer::
+ButtonPressed(uint8_t GPIOButtonPins)
 {
     // If the button changed and it changed to a 1, then the
     // user just pressed it.
-    if((changed & (~debouncedState)) & GPIOButtonPin)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return (changed & (~debouncedState)) & GPIOButtonPins;
 }
 
-bool Debouncer:: 
-ButtonReleased(uint8_t GPIOButtonPin)
+uint8_t Debouncer:: 
+ButtonReleased(uint8_t GPIOButtonPins)
 {
     // If the button changed and it changed to a 0, then the
     // user just released the button.
-    if((changed & debouncedState) & GPIOButtonPin)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return (changed & debouncedState) & GPIOButtonPins;
 }
 
 uint8_t Debouncer::
-ButtonDebouncedStateGet()
+ButtonDebounceStateGet(uint8_t GPIOButtonPins)
 {
-    if(USING_BUTTON_PULLUPS == true)
-    {
-        return debouncedState;
-    }
-    else
-    {  
-        return ~debouncedState;
-    }
+    // Current pressed or not pressed states of the buttons expressed
+    // as one 8 bit byte. A 0 bit denotes the button is not pressed,
+    // and a 1 bit denotes it is being pressed.
+    return ~debouncedState & GPIOButtonPins;
 }
 
