@@ -77,7 +77,7 @@ extern "C"
 #ifndef MAX_BUTTON_CHECKS
 #define MAX_BUTTON_CHECKS       10
 #endif
-                                			// Binary Equivalent
+                                            // Binary Equivalent
 #define BUTTON_PIN_0            (0x0001)	// 00000001		
 #define BUTTON_PIN_1            (0x0002)	// 00000010
 #define BUTTON_PIN_2            (0x0004)	// 00000100
