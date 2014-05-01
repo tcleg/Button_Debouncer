@@ -1,7 +1,7 @@
 //*********************************************************************************
 // State Button Debouncer - Platform Independent
 // 
-// Revision: 1.3
+// Revision: 1.4
 // 
 // Description: Debounces buttons on a single port being used by the application.
 // This module takes what the signal on a GPIO port is doing and removes
@@ -63,7 +63,7 @@ Debouncer(uint8_t pulledUpButtons)
     pullType = pulledUpButtons;
     
     // Initialize the state array
-    for(i = 0; i < MAX_BUTTON_CHECKS; i++)
+    for(i = 0; i < NUM_BUTTON_STATES; i++)
     {
         state[i] = 0xFF;
     }
@@ -83,14 +83,14 @@ ButtonProcess(uint8_t portStatus)
     state[index] = ~(portStatus ^ pullType);
     
     // Debounce the buttons
-    for(i = 0, debouncedState = 0xFF; i < MAX_BUTTON_CHECKS; i++)
+    for(i = 0, debouncedState = 0xFF; i < NUM_BUTTON_STATES; i++)
     {
         debouncedState &= state[i];
     }
     
     // Check to make sure the index hasn't gone over the limit
     index++;
-    if(index >= MAX_BUTTON_CHECKS)
+    if(index >= NUM_BUTTON_STATES)
     {
         index = 0;
     }

@@ -1,7 +1,7 @@
 //*********************************************************************************
 // State Button Debouncer - Platform Independent
 // 
-// Revision: 1.3
+// Revision: 1.4
 // 
 // Description: Debounces buttons on a single port being used by the application.
 // This module takes what the signal on a GPIO port is doing and removes
@@ -59,15 +59,17 @@
 // Macros and Globals
 //*********************************************************************************
 
-// MAX_BUTTON_CHECKS should be greater than 0 and less than or equal to 255.
-// 10 is a roundabout good number of checks to perform before considering a button 
-// debounced. If this number is large, the Debouncer instantiation will consume 
+// NUM_BUTTON_STATES should be greater than 0 and less than or equal to 255.
+// 10 is a roundabout good number of states to have. At a practical minimum, the
+// the number of button states should be at least 3. Each button state consumes
+// 1 byte of RAM.
+// If this number is large, the Debouncer instantiation will consume 
 // more RAM and take more time to debounce but will reduce the chance of having an 
 // incorrectly debounced button. If this is small, the Debouncer instantiation 
-// will consume less RAM but will be more prone to incorrectly determining button 
-// presses and releases.
-#ifndef MAX_BUTTON_CHECKS
-#define MAX_BUTTON_CHECKS       10
+// will consume less RAM and take less time to debounce but will be more prone 
+// to incorrectly determining button presses and releases.
+#ifndef NUM_BUTTON_STATES
+#define NUM_BUTTON_STATES       10
 #endif
                                 			// Binary Equivalent
 #define BUTTON_PIN_0            (0x0001)	// 0b00000001		
@@ -192,7 +194,7 @@ Debouncer
         // 
         // Holds the states that the particular port is transitioning through
         // 
-        uint8_t state[MAX_BUTTON_CHECKS];
+        uint8_t state[NUM_BUTTON_STATES];
         
         // 
         // Keeps up with where to store the next port info in the state array
