@@ -1,24 +1,26 @@
 //*********************************************************************************
-// Platform Independent State Button Debouncer
+// State Button Debouncer - Platform Independent
+// 
+// Revision: 1.5
 // 
 // Description: Debounces buttons on a single port being used by the application.
 // This module takes what the signal on a GPIO port is doing and removes
 // the oscillations caused by a bouncing button and tells the application if
-// the button(s) are debounced. A benefit of this algorithm is that it can play
-// nicely with button interrupts. Below is an example of how the button debouncer
+// the button(s) are debounced. Below is an example of how the button debouncer
 // would work in practice in relation to a single button:
 // 
-// Real Signal:     00110000000000000001110000000000000000001111111000000000000000
-// Bouncy Signal:   00101110000000000001101010000000000000001010101101000000000000
-// Debounced Sig:   00111111111111111001111111111111111000001111111111111111111100
+// Real Signal:     0011111111111110000000000000011111111111111111110000000000
+// Bouncy Signal:   0010110111111111010000000000001010111011111111110101000000
+// Debounced Sig:   0000000000000011000000000000000000000000000001110000000000
 // 
 // The debouncing algorithm used in this library is based partly on Jack
 // Ganssle's state button debouncer example shown in, "A Guide to Debouncing" 
-// Rev 3. http://www.ganssle.com/debouncing.htm
+// Rev 4. http://www.ganssle.com/debouncing.htm
 // 
-// Copyright (C) 2014 Trent Cleghorn
+// Revisions can be found here:
+// https://github.com/tcleg
 // 
-// Email: trentoncleghorn@gmail.com
+// Copyright (C) 2014 Trent Cleghorn , <trentoncleghorn@gmail.com>
 // 
 //                                  MIT License
 // 
@@ -55,14 +57,14 @@ ButtonDebounceInit(tDebouncer *port, uint8_t pulledUpButtons)
     uint8_t i;
     
     port->index = 0;
-    port->debouncedState = 0xFF;
+    port->debouncedState = 0x00;
     port->changed = 0x00;
     port->pullType = pulledUpButtons;
     
     // Initialize the state array
-    for(i = 0; i < MAX_BUTTON_CHECKS; i++)
+    for(i = 0; i < NUM_BUTTON_STATES; i++)
     {
-        port->state[i] = 0xFF;
+        port->state[i] = 0x00;
     }
 }
 
@@ -73,23 +75,21 @@ ButtonProcess(tDebouncer *port, uint8_t portStatus)
     uint8_t lastDebouncedState = port->debouncedState;
     
     // If a button is high and is pulled down or
-    // if a button is low and is pulled high, use a 0 bit
-    // to denote the button has changed state. Else, a 1 bit
+    // if a button is low and is pulled high, use a 1 bit
+    // to denote the button has changed state. Else, a 0 bit
     // shows it is in a normal position.
-    portStatus = ~(portStatus ^ port->pullType);
-    
-    // Save the port status info into the state array
-    port->state[port->index] = portStatus;
+    // Then, save the port status info into the state array
+    port->state[port->index] = portStatus ^ port->pullType;
     
     // Debounce the buttons
-    for(i = 0, port->debouncedState = 0xFF; i < MAX_BUTTON_CHECKS; i++)
+    for(i = 0, port->debouncedState = 0xFF; i < NUM_BUTTON_STATES; i++)
     {
-        port->debouncedState = port->debouncedState & port->state[i];
+        port->debouncedState &= port->state[i];
     }
     
     // Check to make sure the index hasn't gone over the limit
     port->index++;
-    if(port->index >= MAX_BUTTON_CHECKS)
+    if(port->index >= NUM_BUTTON_STATES)
     {
         port->index = 0;
     }
@@ -107,7 +107,7 @@ ButtonPressed(tDebouncer *port, uint8_t GPIOButtonPins)
 {
     // If the button changed and it changed to a 1, then the
     // user just pressed it.
-    return (port->changed & (~port->debouncedState)) & GPIOButtonPins;
+    return (port->changed & port->debouncedState) & GPIOButtonPins;
 }
 
 uint8_t
@@ -115,16 +115,14 @@ ButtonReleased(tDebouncer *port, uint8_t GPIOButtonPins)
 {
     // If the button changed and it changed to a 0, then the
     // user just released the button.
-    return (port->changed & port->debouncedState) & GPIOButtonPins;
+    return (port->changed & (~port->debouncedState)) & GPIOButtonPins;
 }
 
 uint8_t 
-ButtonDebounceStateGet(tDebouncer *port)
+ButtonDebounceStateGet(tDebouncer *port, uint8_t GPIOButtonPins)
 {
-    // Restore the debounced state to the normal sense of direction.
-    // If a button is high and is pulled down, it is being pressed.
-    // If a button is low and is pulled up, it is being pressed.
-    // Else, they are not being pressed.
-    return ~(port->debouncedState ^ port->pullType);
+    // Current pressed or not pressed states of the buttons expressed
+    // as one 8 bit byte. A 0 bit denotes the button is not pressed,
+    // and a 1 bit denotes it is being pressed.
+    return port->debouncedState & GPIOButtonPins;
 }
-

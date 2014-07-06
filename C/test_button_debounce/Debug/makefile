@@ -4,7 +4,7 @@
 
 SHELL = cmd.exe
 
-CG_TOOL_ROOT := C:/ti/ccsv5/tools/compiler/msp430_4.2.1
+CG_TOOL_ROOT := c:/ti/ccsv6/tools/compiler/msp430_4.3.1
 
 ORDERED_OBJS += \
 $(GEN_CMDS__FLAG) \
@@ -108,6 +108,12 @@ endif
 -include ../makefile.defs
 
 # Add inputs and outputs from these tool invocations to the build variables 
+EXE_OUTPUTS += \
+test_button_debounce.out \
+
+EXE_OUTPUTS__QUOTED += \
+"test_button_debounce.out" \
+
 
 # All Target
 all: test_button_debounce.out
@@ -116,13 +122,13 @@ all: test_button_debounce.out
 test_button_debounce.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MSP430 Linker'
-	"C:/ti/ccsv5/tools/compiler/msp430_4.2.1/bin/cl430" -vmsp --abi=eabi -O4 --opt_for_speed=5 --advice:power=all -g --define=__MSP430G2553__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal --verbose -z -m"test_button_debounce.map" --heap_size=80 --stack_size=10 -i"C:/ti/ccsv5/ccs_base/msp430/include" -i"C:/ti/ccsv5/tools/compiler/msp430_4.2.1/lib" -i"C:/ti/ccsv5/tools/compiler/msp430_4.2.1/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="test_button_debounce_linkInfo.xml" --rom_model -o "test_button_debounce.out" $(ORDERED_OBJS)
+	"c:/ti/ccsv6/tools/compiler/msp430_4.3.1/bin/cl430" -vmsp --abi=eabi -O4 --opt_for_speed=5 --advice:power=all -g --define=__MSP430G2553__ --diag_warning=225 --display_error_number --diag_wrap=off --printf_support=minimal -z -m"test_button_debounce.map" --heap_size=80 --stack_size=10 -i"c:/ti/ccsv6/ccs_base/msp430/include" -i"c:/ti/ccsv6/tools/compiler/msp430_4.3.1/lib" -i"c:/ti/ccsv6/tools/compiler/msp430_4.3.1/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="test_button_debounce_linkInfo.xml" --rom_model -o "test_button_debounce.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(MSP430_EXECUTABLE_OUTPUTS__QUOTED) "test_button_debounce.out"
+	-$(RM) $(EXE_OUTPUTS__QUOTED)
 	-$(RM) "button_debounce.pp" "main.pp" 
 	-$(RM) "button_debounce.obj" "main.obj" 
 	-@echo 'Finished clean'

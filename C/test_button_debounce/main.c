@@ -75,25 +75,6 @@ main() {
 // Interrupts
 //*********************************************************************************
 
-// Button Interrupt
-#pragma vector=PORT1_VECTOR
-__interrupt void
-Port1(void)
-{
-    // If the button was pressed, exit the low power mode
-    // and disable button interrupts. Else, reset the flag.
-    if (P1IFG & BUTTON)
-    {
-        LPM_EXIT();
-        P1IE &= ~BUTTON;
-        P1IFG &= ~BUTTON;
-    } 
-    else
-    {
-        P1IFG = 0;
-    }
-}
-
 // The Watchdog Timer interrupts the system every half second and forces it out
 // of Low Power Mode 0
 #pragma vector=WDT_VECTOR
@@ -129,73 +110,40 @@ setup()
     
     // Set Watchdog timer to interval mode and about a 0.5ms interrupt interval
     // This will also be the debouncing interval.
-    WDTCTL = WDT_MDLY_0_5;            
+    WDTCTL = WDT_MDLY_0_5;
     IE1   |= WDTIE;
-    
+
     // Setup GPIO
-    // P1.3 set to input with pullup and generates an interrupt on a falling
-    // edge. All other port pins are set to output and are set LOW.
-    // Port 2 is set to output and LOW as well.
+    // P1.3 set to input with pullup. All other port pins are set to output and 
+    // are set LOW. Port 2 is set to output and LOW as well.
     P1OUT  = BUTTON;                                                            
     P1DIR |= ~BUTTON;
     P2OUT  = 0x00;
     P2DIR  = 0xFF;
     P1REN |= BUTTON;                                                        
-    P1IES |= BUTTON;
-    P1IFG &= ~BUTTON;
-    P1IE  |= BUTTON;
     
-    // Setup the debouncer. Tell the debouncer which buttons are being 
-    // pulled up.
+    // Setup the debouncer. Tell it the button is being pulled up.
     ButtonDebounceInit(&port1, BUTTON);
-    
-    // Wait in Low Power Mode 4 until the button is pressed.
-    LPM_4_ENTER();
 }
 
 void
 loop()
-{
-    static uint8_t buttonPressed = false;
-    
-    // If the button interrupt is disabled... 
-    if(!(P1IE & BUTTON) && (buttonPressed == false))
-    {
-        buttonPressed = true;
-        
-        // Load the debouncer
-        ButtonProcess(&port1, ~BUTTON);
-    }
-    else
-    {
-        // P1IN -> Port 1 Inputs
-        ButtonProcess(&port1, P1IN);
-    }
+{   
+    // Load the debouncer
+    ButtonProcess(&port1, P1IN);
     
     // Check for button press and release.
     if(ButtonPressed(&port1, BUTTON))
     {
-        // Toggle the LEDs on and wait until the WDT wakes up the processor
-        // to continue.
+        // Toggle the LEDs on 
         P1OUT ^= RED_LED | GREEN_LED;
-        LPM_0_ENTER();
     }
     else if(ButtonReleased(&port1, BUTTON))
     {
-        // Toggle the LEDs off and temporarily disable interrupts before
-        // re-enabling the button interrupt since if the interrupt
-        // occurs right before LPM4 is entered the processor will eternally
-        // sleep
+        // Toggle the LEDs off 
         P1OUT ^= RED_LED | GREEN_LED;
-        buttonPressed = false;
-        INTERRUPT_DISABLE();
-        P1IE |= BUTTON;
-        LPM_4_ENTER();
     }
-    else
-    {
-        // Wait until the processor is woken up again to continue debouncing the
-        // buttons
-        LPM_0_ENTER();
-    }
+    
+    // Sleep the processor in Low Power Mode 0
+    LPM_0_ENTER();
 }

@@ -1,18 +1,18 @@
 //*********************************************************************************
 // State Button Debouncer - Platform Independent
 // 
-// Revision: 1.4
+// Revision: 1.5
 // 
 // Description: Debounces buttons on a single port being used by the application.
 // This module takes what the signal on a GPIO port is doing and removes
 // the oscillations caused by a bouncing button and tells the application if
-// the button(s) are debounced. A benefit of this algorithm is that it can play
-// nicely with button interrupts. Below is an example of how the button debouncer
-// would work in practice in relation to a single button:
+// the button(s) are debounced. This algorithm is robust against noise if the 
+// amount of allowable debouncing states is adequate. Below is an example of how 
+// the button debouncer would work in practice in relation to a single button:
 // 
-// Real Signal:     00110000000000000001110000000000000000001111111000000000000000
-// Bouncy Signal:   00101110000000000001101010000000000000001010101101000000000000
-// Debounced Sig:   00111111111111111001111111111111111000001111111111111111111100
+// Real Signal:     0011111111111110000000000000011111111111111111110000000000
+// Bouncy Signal:   0010110111111111010000000000001010111011111111110101000000
+// Debounced Sig:   0000000000000011000000000000000000000000000001110000000000
 // 
 // The debouncing algorithm used in this library is based partly on Jack
 // Ganssle's state button debouncer example shown in, "A Guide to Debouncing" 
@@ -68,7 +68,7 @@ extern "C"
 //*********************************************************************************
 
 // NUM_BUTTON_STATES should be greater than 0 and less than or equal to 255.
-// 10 is a roundabout good number of states to have. At a practical minimum, the
+// 8 is a roundabout good number of states to have. At a practical minimum, the
 // the number of button states should be at least 3. Each button state consumes
 // 1 byte of RAM.
 // If this number is large, the tDebouncer instantiation will consume 
@@ -77,7 +77,7 @@ extern "C"
 // will consume less RAM and take less time to debounce but will be more prone 
 // to incorrectly determining button presses and releases.
 #ifndef NUM_BUTTON_STATES
-#define NUM_BUTTON_STATES       10
+#define NUM_BUTTON_STATES       8
 #endif
                                 			// Binary Equivalent
 #define BUTTON_PIN_0            (0x0001)	// 00000001		
@@ -131,12 +131,12 @@ tDebouncer;
 // Parameters:
 //      port - The address of a tDebouncer instantiation.
 //      pulledUpButtons - Specifies whether pullups or pulldowns are being used on the
-//                        port pins. This is the ORed BUTTON_PIN_* 's that are being
-//                        pulled up. Otherwise, the debouncer assumes that the other
-//                        buttons are being pulled down. A 0 bit means pulldown.
-//                        A 1 bit means pullup. For example, 00010001 means that
-//                        button 0 and button 4 are both being pulled up. All other
-//                        buttons have pulldowns if they represent buttons.
+//          port pins. This is the ORed BUTTON_PIN_* 's that are being
+//          pulled up. Otherwise, the debouncer assumes that the other
+//          buttons are being pulled down. A 0 bit means pulldown.
+//          A 1 bit means pullup. For example, 00010001 means that
+//          button 0 and button 4 are both being pulled up. All other
+//          buttons have pulldowns if they represent buttons.
 // Returns:
 //      None
 // 
@@ -147,21 +147,12 @@ extern void ButtonDebounceInit(tDebouncer *port, uint8_t pulledUpButtons);
 // Description:
 //      Does the calculations on debouncing the buttons on a particular
 //      port. This function should be called on a regular interval by the
-//      application such as every 1 to 10 milliseconds. 
+//      application such as every 0.5 milliseconds to 5 milliseconds. 
 // Parameters:
 //      port - The address of a tDebouncer instantiation.
 //      portStatus - The particular port's status expressed as one 8 bit byte.
 // Returns:
 //      None
-// Note:
-//      A good alternative way to use this function is to set up interrupts for 
-//      the buttons on a particular port and have this function called after a 
-//      button is pressed (and interrupts are temporarily disabled for that button) 
-//      then pass the initial state of the buttons and set this function to be 
-//      called on a regular interval thereafter until the button(s) are released. 
-//      The particular button's interrupt is then re-enabled. With this method,
-//      computation time spent in constantly checking the buttons when none have
-//      been pressed goes unwasted.
 // 
 extern void ButtonProcess(tDebouncer *port, uint8_t portStatus);
 
@@ -172,7 +163,7 @@ extern void ButtonProcess(tDebouncer *port, uint8_t portStatus);
 // Parameters:
 //      port - The address of a tDebouncer instantiation.
 //      GPIOButtonPins - The particular bits corresponding to the button pins.
-//                       The ORed combination of BUTTON_PIN_*.
+//          The ORed combination of BUTTON_PIN_*.
 // Returns:
 //      The port pin buttons that have just been pressed. For example, if
 //      (BUTTON_PIN_5 | BUTTON_PIN_0) is passed as a parameter for 
@@ -180,10 +171,6 @@ extern void ButtonProcess(tDebouncer *port, uint8_t portStatus);
 //      00000001, it means that button 0 (bit 0) has just been pressed while
 //      button 5 (bit 5) has not been at the moment though it may have been
 //      previously.
-// Note:
-//      The application should wait until a button is released before 
-//      re-enabling any disabled button interrupts (if the button pins have 
-//      interrupts attached to them).
 // 
 extern uint8_t ButtonPressed(tDebouncer *port, uint8_t GPIOButtonPins);
 
@@ -194,7 +181,7 @@ extern uint8_t ButtonPressed(tDebouncer *port, uint8_t GPIOButtonPins);
 // Parameters:
 //      port - The address of a tDebouncer instantiation.
 //      GPIOButtonPins - The particular bits corresponding to the button pins.
-//                       The ORed combination of BUTTON_PIN_*.
+//          The ORed combination of BUTTON_PIN_*.
 // Returns:
 //      The port pin buttons that have just been released. For example, if
 //      (BUTTON_PIN_5 | BUTTON_PIN_0) is passed as a parameter for 
@@ -202,10 +189,6 @@ extern uint8_t ButtonPressed(tDebouncer *port, uint8_t GPIOButtonPins);
 //      00000001, it means that button 0 (bit 0) has just been released while
 //      button 5 (bit 5) has not been at the moment though it may have been
 //      previously.
-// Note:
-//      The application should wait until a button is released before 
-//      re-enabling any disabled button interrupts (if the button pins have 
-//      interrupts attached to them).
 // 
 extern uint8_t ButtonReleased(tDebouncer *port, uint8_t GPIOButtonPins);
 
@@ -216,7 +199,7 @@ extern uint8_t ButtonReleased(tDebouncer *port, uint8_t GPIOButtonPins);
 // Parameters:
 //      port - The address of a tDebouncer instantiation.
 //      GPIOButtonPins - The particular bits corresponding to the button pins.
-//                       The ORed combination of BUTTON_PIN_*.
+//          The ORed combination of BUTTON_PIN_*.
 // Returns:
 //      The port pins the are currently being debounced. For example, if
 //      (BUTTON_PIN_5 | BUTTON_PIN_1) is passed as a parameter for 
