@@ -159,7 +159,7 @@ extern void ButtonProcess(tDebouncer *port, uint8_t portStatus);
 // 
 // Button Pressed
 // Description:
-//      Checks to see if a button(s) were pressed. 
+//      Checks to see if a button(s) were immediately pressed. 
 // Parameters:
 //      port - The address of a tDebouncer instantiation.
 //      GPIOButtonPins - The particular bits corresponding to the button pins.
@@ -177,7 +177,7 @@ extern uint8_t ButtonPressed(tDebouncer *port, uint8_t GPIOButtonPins);
 // 
 // Button Released
 // Description:
-//      Checks to see if a button(s) were released. 
+//      Checks to see if a button(s) were immediately released. 
 // Parameters:
 //      port - The address of a tDebouncer instantiation.
 //      GPIOButtonPins - The particular bits corresponding to the button pins.
@@ -195,7 +195,9 @@ extern uint8_t ButtonReleased(tDebouncer *port, uint8_t GPIOButtonPins);
 // 
 // Button Debounce State Get
 // Description:
-//      Gets the currently debounced state of the port pins.
+//      Gets the currently debounced state of the port pins. In other words,
+//      which buttons are currently being pressed and which buttons are
+//      currently NOT being pressed.
 // Parameters:
 //      port - The address of a tDebouncer instantiation.
 //      GPIOButtonPins - The particular bits corresponding to the button pins.

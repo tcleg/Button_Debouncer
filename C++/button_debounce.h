@@ -124,7 +124,7 @@ Debouncer
         // 
         // Button Pressed
         // Description:
-        //      Checks to see if a button(s) were pressed. 
+        //      Checks to see if a button(s) were immediately pressed. 
         // Parameters:
         //      GPIOButtonPins - The particular bits corresponding to the button pins.
         //          The ORed combination of BUTTON_PIN_*.
@@ -141,7 +141,7 @@ Debouncer
         // 
         // Button Released
         // Description:
-        //      Checks to see if a button(s) were released. 
+        //      Checks to see if a button(s) were immediately released. 
         // Parameters:
         //      GPIOButtonPins - The particular bits corresponding to the button pins.
         //          The ORed combination of BUTTON_PIN_*.
@@ -158,7 +158,9 @@ Debouncer
         // 
         // Button Debounce State Get
         // Description:
-        //      Gets the currently debounced state of the port pins.
+        //      Gets the currently debounced state of the port pins. In other words,
+        //      which buttons are currently being pressed and which buttons are
+        //      currently NOT being pressed.
         // Parameters:
         //      GPIOButtonPins - The particular bits corresponding to the button pins.
         //          The ORed combination of BUTTON_PIN_*.
