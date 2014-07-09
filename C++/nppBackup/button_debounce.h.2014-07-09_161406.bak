@@ -159,7 +159,8 @@ Debouncer
         // Button Debounce State Get
         // Description:
         //      Gets the currently debounced state of the port pins. In other words,
-        //      which buttons are currently being pressed.
+        //      which buttons are currently being pressed and which buttons are
+        //      currently NOT being pressed.
         // Parameters:
         //      GPIOButtonPins - The particular bits corresponding to the button pins.
         //          The ORed combination of BUTTON_PIN_*.
