@@ -112,7 +112,7 @@ Debouncer
         // Description:
         //      Does the calculations on debouncing the buttons on a particular
         //      port. This function should be called on a regular interval by the
-        //      application such as every 0.5 milliseconds to 5 milliseconds. 
+        //      application such as every 0.5 milliseconds or 5 milliseconds. 
         // Parameters:
         //      portStatus - The particular port's status expressed as one 8 bit 
         //          byte.
@@ -126,15 +126,15 @@ Debouncer
         // Description:
         //      Checks to see if a button(s) were immediately pressed. 
         // Parameters:
-        //      GPIOButtonPins - The particular bits corresponding to the button pins.
-        //          The ORed combination of BUTTON_PIN_*.
+        //      GPIOButtonPins - The particular bits corresponding to the button 
+        //          pins. The ORed combination of BUTTON_PIN_*.
         // Returns:
         //      The port pin buttons that have just been pressed. For example, if
         //      (BUTTON_PIN_5 | BUTTON_PIN_0) is passed as a parameter for 
-        //      GPIOButtonPins and if the byte that is returned expressed in binary is 
-        //      00000001, it means that button 0 (bit 0) has just been pressed while
-        //      button 5 (bit 5) has not been at the moment though it may have been
-        //      previously.
+        //      GPIOButtonPins and if the byte that is returned expressed in binary 
+        //      is 00000001, it means that button 0 (bit 0) has just been pressed 
+        //      while button 5 (bit 5) has not been at the moment though it may 
+        //      have been previously.
         // 
         uint8_t ButtonPressed(uint8_t GPIOButtonPins);
         
@@ -143,15 +143,15 @@ Debouncer
         // Description:
         //      Checks to see if a button(s) were immediately released. 
         // Parameters:
-        //      GPIOButtonPins - The particular bits corresponding to the button pins.
-        //          The ORed combination of BUTTON_PIN_*.
+        //      GPIOButtonPins - The particular bits corresponding to the button 
+        //          pins. The ORed combination of BUTTON_PIN_*.
         // Returns:
         //      The port pin buttons that have just been released. For example, if
         //      (BUTTON_PIN_5 | BUTTON_PIN_0) is passed as a parameter for 
-        //      GPIOButtonPins and if the byte that is returned expressed in binary is 
-        //      00000001, it means that button 0 (bit 0) has just been released while
-        //      button 5 (bit 5) has not been at the moment though it may have been
-        //      previously.
+        //      GPIOButtonPins and if the byte that is returned expressed in binary 
+        //      is 00000001, it means that button 0 (bit 0) has just been released 
+        //      while button 5 (bit 5) has not been at the moment though it may 
+        //      have been previously.
         // 
         uint8_t ButtonReleased(uint8_t GPIOButtonPins);
         
@@ -161,8 +161,8 @@ Debouncer
         //      Gets the currently debounced state of the port pins. In other words,
         //      which buttons are currently being pressed.
         // Parameters:
-        //      GPIOButtonPins - The particular bits corresponding to the button pins.
-        //          The ORed combination of BUTTON_PIN_*.
+        //      GPIOButtonPins - The particular bits corresponding to the button 
+        //          pins. The ORed combination of BUTTON_PIN_*.
         // Returns:
         //      The port pins the are currently being debounced. For example, if
         //      (BUTTON_PIN_5 | BUTTON_PIN_1) is passed as a parameter for 

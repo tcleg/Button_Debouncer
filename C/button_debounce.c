@@ -53,7 +53,7 @@
 // Functions
 //*********************************************************************************
 void 
-ButtonDebounceInit(tDebouncer *port, uint8_t pulledUpButtons)
+ButtonDebounceInit(Debouncer *port, uint8_t pulledUpButtons)
 {
     uint8_t i;
     
@@ -70,7 +70,7 @@ ButtonDebounceInit(tDebouncer *port, uint8_t pulledUpButtons)
 }
 
 void
-ButtonProcess(tDebouncer *port, uint8_t portStatus)
+ButtonProcess(Debouncer *port, uint8_t portStatus)
 {
     uint8_t i;
     uint8_t lastDebouncedState = port->debouncedState;
@@ -104,7 +104,7 @@ ButtonProcess(tDebouncer *port, uint8_t portStatus)
 }
 
 uint8_t
-ButtonPressed(tDebouncer *port, uint8_t GPIOButtonPins)
+ButtonPressed(Debouncer *port, uint8_t GPIOButtonPins)
 {
     // If the button changed and it changed to a 1, then the
     // user just pressed it.
@@ -112,7 +112,7 @@ ButtonPressed(tDebouncer *port, uint8_t GPIOButtonPins)
 }
 
 uint8_t
-ButtonReleased(tDebouncer *port, uint8_t GPIOButtonPins)
+ButtonReleased(Debouncer *port, uint8_t GPIOButtonPins)
 {
     // If the button changed and it changed to a 0, then the
     // user just released the button.
@@ -120,7 +120,7 @@ ButtonReleased(tDebouncer *port, uint8_t GPIOButtonPins)
 }
 
 uint8_t 
-ButtonDebounceStateGet(tDebouncer *port, uint8_t GPIOButtonPins)
+ButtonDebounceStateGet(Debouncer *port, uint8_t GPIOButtonPins)
 {
     // Current pressed or not pressed states of the buttons expressed
     // as one 8 bit byte. A 0 bit denotes the button is not pressed,
