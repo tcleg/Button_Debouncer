@@ -1,7 +1,7 @@
 //*********************************************************************************
 // State Button Debouncer - Platform Independent
 // 
-// Revision: 1.5
+// Revision: 1.6
 // 
 // Description: Debounces buttons on a single port being used by the application.
 // This module takes what the signal on a GPIO port is doing and removes
@@ -156,10 +156,9 @@ Debouncer
         uint8_t ButtonReleased(uint8_t GPIOButtonPins);
         
         // 
-        // Button Debounce State Get
+        // Button Current
         // Description:
-        //      Gets the currently debounced state of the port pins. In other words,
-        //      which buttons are currently being pressed.
+        //      Gets which buttons are currently being pressed.
         // Parameters:
         //      GPIOButtonPins - The particular bits corresponding to the button 
         //          pins. The ORed combination of BUTTON_PIN_*.
@@ -171,7 +170,7 @@ Debouncer
         //      is currently being pressed while the other buttons (if they are 
         //      buttons) are being masked out.
         // 
-        uint8_t ButtonDebounceStateGet(uint8_t GPIOButtonPins);
+        uint8_t ButtonCurrent(uint8_t GPIOButtonPins);
         
     private:
         // 
